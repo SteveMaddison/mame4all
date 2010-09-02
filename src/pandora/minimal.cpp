@@ -40,6 +40,7 @@ unsigned int			pnd_nflip;
 volatile unsigned short	pnd_palette[512];
 unsigned short			pnd_palette_rgb[256];
 SDL_AudioSpec 			pnd_audio_spec;
+int						pnd_audio_buffer_len=0;
 int						pnd_sndlen=0;
 int						pnd_sound_rate=22050;
 int						pnd_sound_stereo=1;
@@ -106,7 +107,27 @@ int pnd_fb_set( int fb_w, int fb_h, int scr_w, int scr_h, int bpp, int buffers )
 int pnd_fb_reset( void ) {
 	char cmd[256];
 	snprintf( cmd, sizeof(cmd), "ofbset -fb %s -pos 0 0 -size 0 0 -mem 0 -en 0", PND_FBDEV );
-	system( cmd );
+
+	if( pnd_run_cmd(cmd) != 0 )
+		return -1;
+
+	return 0;
+}
+
+int pnd_fir_filter_set( int f ) {
+	char cmd[256];
+	char *filter_name = "default";
+	
+	switch( f ) {
+		case PND_FIR_FILTER_NONE:
+			filter_name = "none";
+			break;
+		case PND_FIR_FILTER_DEFAULT:
+		default:
+			break;
+	}
+
+	snprintf( cmd, sizeof(cmd), "sudo /usr/pandora/scripts/op_videofir.sh %s", filter_name );
 
 	if( pnd_run_cmd(cmd) != 0 )
 		return -1;
@@ -321,6 +342,11 @@ void pnd_timer_profile(void)
 
 void pnd_sound_play(void *buff, int len)
 {
+	if( pnd_sndlen+len > pnd_audio_buffer_len ) {
+		/* Overrun */
+		return;
+	}
+	
 	SDL_LockAudio();
 	memcpy( pnd_audio_spec.userdata + pnd_sndlen, buff, len );
 	pnd_sndlen += len;
@@ -351,8 +377,9 @@ void pnd_sound_thread_start(void)
     pnd_audio_spec.freq = pnd_sound_rate;
     pnd_audio_spec.channels = pnd_sound_stereo ? 2: 1;
 
-	void *audiobuf = malloc( pnd_audio_spec.samples * pnd_audio_spec.channels * 2 * 64 );
-	memset( audiobuf, 0 , pnd_audio_spec.samples * pnd_audio_spec.channels * 2 * 64 );
+	pnd_audio_buffer_len = pnd_audio_spec.samples * pnd_audio_spec.channels * 2 * 64;
+	void *audiobuf = malloc( pnd_audio_buffer_len );
+	memset( audiobuf, 0 , pnd_audio_buffer_len );
 	pnd_audio_spec.userdata=audiobuf;
 
 	if ( SDL_OpenAudio(&pnd_audio_spec, NULL) < 0 )

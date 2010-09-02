@@ -84,6 +84,8 @@ int video_scale=0;
 int video_border=0;
 int video_aspect=0;
 int video_stretch=0;
+int video_fit=0;
+int video_filter=-1;
 
 /* Create a bitmap. Also calls osd_clearbitmap() to appropriately initialize */
 /* it to the background color. */
@@ -417,61 +419,92 @@ int osd_create_display(int width,int height,int depth,int fps,int attributes,int
 		printf("New aspect ratio: %f\n", (float)pnd_phys_width/(float)pnd_phys_height );
 	}
 	else if( video_aspect ) {
-		/* Force 4:3 aspect ratio */
-		pnd_phys_height = PHYS_SCREEN_HEIGHT;
-		pnd_phys_width = (PHYS_SCREEN_HEIGHT/3)*4;
+		if( width > height ) {
+			/* Force 4:3 aspect ratio */
+			pnd_phys_height = PHYS_SCREEN_HEIGHT;
+			pnd_phys_width = (PHYS_SCREEN_HEIGHT/3)*4;
+		}
+		else {
+			/* Vertical: force 3:4 aspect ratio */
+			pnd_phys_height = PHYS_SCREEN_HEIGHT;
+			pnd_phys_width = (PHYS_SCREEN_HEIGHT/4)*3;			
+		}
 	}
 	else if( video_stretch ) {
 		/* Stre-e-e-etch to fill screen */
 		pnd_phys_width = PHYS_SCREEN_WIDTH;
 		pnd_phys_height = PHYS_SCREEN_HEIGHT;
 	}
-	else {
-		/* Normal mode : select an integer scale which best matches the
-		   physical screen. Borders and/or clipping may occur. */
+	else {		
 		int scale = 1;
 
 		/* Bump up the scale until the image won't fit on the screen. */
-		while( width * scale < PHYS_SCREEN_WIDTH && height * scale < PHYS_SCREEN_HEIGHT )
+		while( width * scale <= PHYS_SCREEN_WIDTH && height * scale <= PHYS_SCREEN_HEIGHT )
 			scale ++;
-
-		if( scale > 1 ) {
-			/* Calculate screen diagonal for this scale and the previous one */
-			int screen_diag = sqrt( (PHYS_SCREEN_WIDTH*PHYS_SCREEN_WIDTH) + (PHYS_SCREEN_HEIGHT*PHYS_SCREEN_HEIGHT) );
-			int this_diag = sqrt( pow( width*scale, 2 ) + pow( height*scale, 2 ) );
-			int prev_diag = sqrt( pow( width*(scale-1), 2 ) + pow( height*(scale-1), 2 ) );
-
-			/* If previous scale is closer to the physical screen diagonal, use it. */
-			if( abs(screen_diag-prev_diag) < abs(screen_diag-this_diag) ) {
-				scale--;
-			}
-		}
-			
-		pnd_phys_width  = width  * scale;
-		pnd_phys_height = height * scale;
 		
-		/* Clipping in both dimensions? Take a step back, if we can. */
-		if( pnd_phys_width > PHYS_SCREEN_WIDTH && pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
+		if( video_fit ) {
+			/* Best fit : select an integer scale which best matches the
+			   physical screen. Borders and/or clipping may occur. */
+			   
 			if( scale > 1 ) {
-				scale--;
-				pnd_phys_width  = width  * scale;
-				pnd_phys_height = height * scale;
+				/* Calculate screen diagonal for this scale and the previous one */
+				int screen_diag = sqrt( (PHYS_SCREEN_WIDTH*PHYS_SCREEN_WIDTH) + (PHYS_SCREEN_HEIGHT*PHYS_SCREEN_HEIGHT) );
+				int this_diag = sqrt( pow( width*scale, 2 ) + pow( height*scale, 2 ) );
+				int prev_diag = sqrt( pow( width*(scale-1), 2 ) + pow( height*(scale-1), 2 ) );
+	
+				/* If previous scale is closer to the physical screen diagonal, use it. */
+				if( abs(screen_diag-prev_diag) < abs(screen_diag-this_diag) ) {
+					scale--;
+				}
+			}
+				
+			pnd_phys_width  = width  * scale;
+			pnd_phys_height = height * scale;
+			
+			/* Clipping in both dimensions? Take a step back, if we can. */
+			if( pnd_phys_width > PHYS_SCREEN_WIDTH && pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
+				if( scale > 1 ) {
+					scale--;
+					pnd_phys_width  = width  * scale;
+					pnd_phys_height = height * scale;
+				}
+			}
+			
+			if( pnd_phys_width > PHYS_SCREEN_WIDTH || pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
+				/* Clipping... */
+				if( pnd_phys_width > PHYS_SCREEN_WIDTH ) {
+					pnd_phys_width = PHYS_SCREEN_WIDTH;
+					width = PHYS_SCREEN_WIDTH/scale;
+				}
+				if( pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
+					pnd_phys_height = PHYS_SCREEN_HEIGHT;
+					height = PHYS_SCREEN_HEIGHT/scale;
+				}
+				/* Reset the screen mode with out new value(s). */
+				select_display_mode(width,height,depth,attributes,orientation);
 			}
 		}
-		
-		if( pnd_phys_width > PHYS_SCREEN_WIDTH || pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
-			/* Clipping... */
-			if( pnd_phys_width > PHYS_SCREEN_WIDTH ) {
-				pnd_phys_width = PHYS_SCREEN_WIDTH;
-				width = PHYS_SCREEN_WIDTH/scale;
-			}
-			if( pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
-				pnd_phys_height = PHYS_SCREEN_HEIGHT;
-				height = PHYS_SCREEN_HEIGHT/scale;
-			}
-			/* Reset the screen mode with out new value(s). */
-			select_display_mode(width,height,depth,attributes,orientation);
+		else {
+			/* Normal mode: largest integer scale which fits without clipping. */
+			scale--;
+			if( scale < 1 ) scale = 1;
+			
+			pnd_phys_width  = width  * scale;
+			pnd_phys_height = height * scale;
 		}
+	}
+
+	if( video_filter == -1 ) {
+		/* Automatically enable the filter for fractional scaling, or
+		 * disable it for integer scaling modes. */
+		if( (pnd_phys_width % width) || (pnd_phys_height % height) )
+			pnd_fir_filter_set( PND_FIR_FILTER_DEFAULT );
+		else
+			pnd_fir_filter_set( PND_FIR_FILTER_NONE );
+	}
+	else {
+		/* Set filter as requested */
+		pnd_fir_filter_set( video_filter );
 	}
 
 	if (!osd_set_display(width,height,depth,attributes,orientation))

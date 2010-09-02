@@ -22,12 +22,14 @@ char playgame[16] = "builtinn\0";
 int pnd_freq=200;
 int pnd_video_depth=16;
 int pnd_video_aspect=1;
+int pnd_video_rotate=0;
+int pnd_video_filter=-1;
 int pnd_video_sync=1;
 int pnd_frameskip=2;
 int pnd_sound = 1;
-int pnd_volume = 3;
-int pnd_clock_cpu=80;
-int pnd_clock_sound=80;
+int pnd_volume = 4;
+int pnd_clock_cpu=100;
+int pnd_clock_sound=100;
 int pnd_cpu_cores=1;
 int pnd_ramtweaks=1;
 int pnd_cheat=0;
@@ -233,8 +235,9 @@ static int show_options(char *game)
 {
 	unsigned long ExKey=0;
 	int selected_option=0;
-	int x_Pos = 81;
-	int y_Pos = 58;
+	int x_Pos = 41;
+	int y_PosTop = 58;
+	int y_Pos = y_PosTop;
 	int options_count = 10;
 	char text[256];
 	FILE *f;
@@ -259,109 +262,127 @@ static int show_options(char *game)
 		text[32]='\0';
 		pnd_gamelist_text_out(x_Pos,y_Pos-10,text);
 
-		/* (0) Video Depth */
-		switch (pnd_video_depth)
-		{
-			case -1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+10,"Video Depth   Auto"); break;
-			case 8:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos+10,"Video Depth   8 bit"); break;
-			case 16: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+10,"Video Depth   16 bit"); break;
-		}
-
-		/* (1) Video Aspect */
+		/* Video Aspect */
+		y_Pos += 10;
 		switch (pnd_video_aspect)
 		{
-			case 0: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Normal"); break;
-			case 1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Scale"); break;
-			case 2: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  4:3"); break;
-			case 3: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Stretch"); break;
-			case 4: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Rotate Normal"); break;
-			case 5: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Rotate Scale"); break;
-			case 6: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Rotate 4:3"); break;
-			case 7: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+20,"Video Aspect  Rotate Stretch"); break;
+			case 0: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Normal"); break;
+			case 1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Scale"); break;
+			case 3: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    4:3"); break;
+			case 4: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Stretch"); break;
+			case 5: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Best Fit"); break;
+		}
+
+		/* Video Rotation */
+		y_Pos += 10;
+		switch (pnd_video_rotate)
+		{
+			case 0:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Rotation  OFF"); break;
+			case 1:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Rotation  ON"); break;
+		}
+
+		/* Video Filter */
+		y_Pos += 10;
+		switch (pnd_video_filter)
+		{
+			case -1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Filter    Auto"); break;
+			case 0:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Filter    None"); break;
+			case 1:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Filter    Default"); break;
 		}
 		
-		/* (2) Video Sync */
+		/* Video Sync */
+		y_Pos += 10;
 		switch (pnd_video_sync)
 		{
-			case 1: pnd_gamelist_text_out(x_Pos,y_Pos+30, "Video Sync    VSync"); break;
-			case 0: pnd_gamelist_text_out(x_Pos,y_Pos+30, "Video Sync    Normal"); break;
-			case 2: pnd_gamelist_text_out(x_Pos,y_Pos+30, "Video Sync    DblBuf"); break;
-			case -1: pnd_gamelist_text_out(x_Pos,y_Pos+30,"Video Sync    OFF"); break;
+			case 0: pnd_gamelist_text_out(x_Pos,y_Pos, "Video Sync      Normal"); break;
+			case 1: pnd_gamelist_text_out(x_Pos,y_Pos, "Video Sync      VSync"); break;
+			case 2: pnd_gamelist_text_out(x_Pos,y_Pos, "Video Sync      DblBuf"); break;
+			case -1: pnd_gamelist_text_out(x_Pos,y_Pos,"Video Sync      OFF"); break;
 		}
 		
-		/* (3) Frame-Skip */
+		/* Frame-Skip */
+		y_Pos += 10;
 		if ((pnd_video_sync==-1) && (pnd_frameskip==-1)) pnd_frameskip=0;
 		if(pnd_frameskip==-1) {
-			pnd_gamelist_text_out_fmt(x_Pos,y_Pos+40, "Frame-Skip    Auto");
+			pnd_gamelist_text_out_fmt(x_Pos,y_Pos, "Frame-Skip      Auto");
 		}
 		else{
-			pnd_gamelist_text_out_fmt(x_Pos,y_Pos+40,"Frame-Skip    %d",pnd_frameskip);
+			pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Frame-Skip      %d",pnd_frameskip);
 		}
 
-		/* (4) Sound */
+		/* Sound */
+		y_Pos += 10;
 		switch(pnd_sound)
 		{
-			case 0: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","OFF"); break;
-			case 1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (15 KHz fast)"); break;
-			case 2: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (22 KHz fast)"); break;
-			case 3: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (33 KHz fast)"); break;
-			case 4: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (44 KHz fast)"); break;
-			case 5: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (11 KHz fast)"); break;
-			case 6: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (15 KHz)"); break;
-			case 7: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (22 KHz)"); break;
-			case 8: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (33 KHz)"); break;
-			case 9: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (44 KHz)"); break;
-			case 10: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (11 KHz)"); break;
-			case 11: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (15 KHz stereo)"); break;
-			case 12: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (22 KHz stereo)"); break;
-			case 13: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (33 KHz stereo)"); break;
-			case 14: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (44 KHz stereo)"); break;
-			case 15: pnd_gamelist_text_out_fmt(x_Pos,y_Pos+50,"Sound         %s","ON (11 KHz stereo)"); break;
+			case 0:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","OFF"); break;
+			case 1:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (15 KHz fast)"); break;
+			case 2:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (22 KHz fast)"); break;
+			case 3:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (33 KHz fast)"); break;
+			case 4:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (44 KHz fast)"); break;
+			case 5:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (11 KHz fast)"); break;
+			case 6:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (15 KHz mono)"); break;
+			case 7:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (22 KHz mono)"); break;
+			case 8:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (33 KHz mono)"); break;
+			case 9:  pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (44 KHz mono)"); break;
+			case 10: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (11 KHz mono)"); break;
+			case 11: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (15 KHz stereo)"); break;
+			case 12: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (22 KHz stereo)"); break;
+			case 13: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (33 KHz stereo)"); break;
+			case 14: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (44 KHz stereo)"); break;
+			case 15: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Sound           %s","ON (11 KHz stereo)"); break;
 		}
 
-		/* (5) CPU Clock */
-		pnd_gamelist_text_out_fmt(x_Pos,y_Pos+60,"CPU Clock     %d%%",pnd_clock_cpu);
+		/* CPU Clock */
+		y_Pos += 10;
+		pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"CPU Clock       %d%%",pnd_clock_cpu);
 
-		/* (6) Audio Clock */
-		pnd_gamelist_text_out_fmt(x_Pos,y_Pos+70,"Audio Clock   %d%%",pnd_clock_sound);
+		/* Audio Clock */
+		y_Pos += 10;
+		pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Audio Clock     %d%%",pnd_clock_sound);
 
-		/* (7) CPU cores */
+		/* CPU cores */
+		y_Pos += 10;
 		switch (pnd_cpu_cores)
 		{
-			case 0: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores None"); break;
-			case 1: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores Cyclone"); break;
-			case 2: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores DrZ80"); break;
-			case 3: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores Cyclone+DrZ80"); break;
-			case 4: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores DrZ80(snd)"); break;
-			case 5: pnd_gamelist_text_out(x_Pos,y_Pos+80, "CPU ASM cores Cyclone+DrZ80(snd)"); break;
+			case 0: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   None"); break;
+			case 1: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   Cyclone"); break;
+			case 2: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   DrZ80"); break;
+			case 3: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   Cyclone+DrZ80"); break;
+			case 4: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   DrZ80(snd)"); break;
+			case 5: pnd_gamelist_text_out(x_Pos,y_Pos, "CPU ASM cores   Cyclone+DrZ80(snd)"); break;
 		}
 
-		/* (8) Cheats */
+		/* Cheats */
+		y_Pos += 10;
 		if (pnd_cheat)
-			pnd_gamelist_text_out(x_Pos,y_Pos+90,"Cheats        ON");
+			pnd_gamelist_text_out(x_Pos,y_Pos,"Cheats          ON");
 		else
-			pnd_gamelist_text_out(x_Pos,y_Pos+90,"Cheats        OFF");
+			pnd_gamelist_text_out(x_Pos,y_Pos,"Cheats          OFF");
 
-        /* (9) Volume */
+        /* Volume */
+        y_Pos += 10;
+        /* Does nothing on Pandora right now...
         if (pnd_sound == 0)
         {
-            pnd_gamelist_text_out(x_Pos,y_Pos+100,"Volume        Disabled");
+            pnd_gamelist_text_out(x_Pos,y_Pos,"Volume          Disabled");
         }
         else
         {
             switch (pnd_volume)
             {
-                case 1: pnd_gamelist_text_out(x_Pos,y_Pos+100,"Volume        Quiet"); break;
-                case 2: pnd_gamelist_text_out(x_Pos,y_Pos+100,"Volume        Low"); break;
-                case 3: pnd_gamelist_text_out(x_Pos,y_Pos+100,"Volume        Medium"); break;
-                case 4: pnd_gamelist_text_out(x_Pos,y_Pos+100,"Volume        Maximum"); break;
+                case 1: pnd_gamelist_text_out(x_Pos,y_Pos,"Volume          Quiet"); break;
+                case 2: pnd_gamelist_text_out(x_Pos,y_Pos,"Volume          Low"); break;
+                case 3: pnd_gamelist_text_out(x_Pos,y_Pos,"Volume          Medium"); break;
+                case 4: pnd_gamelist_text_out(x_Pos,y_Pos,"Volume          Maximum"); break;
             }
         }
+        */
 	
-		pnd_gamelist_text_out(x_Pos,y_Pos+140,"Press B to confirm, X to return\0");
+		y_Pos += 30;
+		pnd_gamelist_text_out(x_Pos,y_Pos,"Press B to confirm, X to return\0");
 
 		/* Show currently selected item */
-		pnd_gamelist_text_out(x_Pos-16,y_Pos+(selected_option*10)+10," >");
+		pnd_gamelist_text_out(x_Pos-16,y_PosTop+(selected_option*10)+10," >");
 
 		pnd_video_flip();
 		while(pnd_joystick_read(0)&0x8c0ff55) { pnd_timer_delay(150); }
@@ -486,14 +507,15 @@ static int show_options(char *game)
 			}
 		}
 
-		if ((ExKey & PND_A) || (ExKey & PND_B) || (ExKey & PND_PUSH) || (ExKey & PND_START)) 
+		if ((ExKey & PND_A) || (ExKey & PND_B) || (ExKey & PND_START)) 
 		{
 			/* Write game configuration */
 			sprintf(text,"frontend/%s.cfg",game);
 			f=fopen(text,"w");
 			if (f) {
-				fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",pnd_freq,pnd_video_depth,pnd_video_aspect,pnd_video_sync,
-				pnd_frameskip,pnd_sound,pnd_clock_cpu,pnd_clock_sound,pnd_cpu_cores,pnd_ramtweaks,i,pnd_cheat,pnd_volume);
+				fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",pnd_freq,pnd_video_depth,pnd_video_aspect,pnd_video_sync,
+				pnd_frameskip,pnd_sound,pnd_clock_cpu,pnd_clock_sound,pnd_cpu_cores,pnd_ramtweaks,i,pnd_cheat,pnd_volume,
+				pnd_video_rotate,pnd_video_filter);
 				fclose(f);
 				sync();
 			}
@@ -546,7 +568,7 @@ static void select_game(char *emu, char *game)
 		if (ExKey & PND_R) last_game_selected+=21;
 		if ((ExKey & PND_L) && (ExKey & PND_R)) pnd_exit();
 
-		if ((ExKey & PND_A) || (ExKey & PND_B) || (ExKey & PND_PUSH) || (ExKey & PND_START))
+		if ((ExKey & PND_A) || (ExKey & PND_B) || (ExKey & PND_START))
 		{
 			/* Select the game */
 			game_list_select(last_game_selected, game, emu);
@@ -579,6 +601,7 @@ void execute_game (char *playemu, char *playgame)
 	args[n]=str[i]; i++; n++;
 
 	/* pnd_video_depth */
+#ifdef PANDORA_FB_DRIVER_CAN_DO_8BPP
 	if (pnd_video_depth==8)
 	{
 		args[n]="-depth"; n++;
@@ -589,24 +612,40 @@ void execute_game (char *playemu, char *playgame)
 		args[n]="-depth"; n++;
 		args[n]="16"; n++;
 	}
+#else
+	args[n]="-depth"; n++;
+	args[n]="16"; n++;
+#endif
 
 	/* pnd_video_aspect */
-	if ((pnd_video_aspect==1) || (pnd_video_aspect==5) )
+	switch(pnd_video_aspect)
 	{
-		args[n]="-scale"; n++;
+		case 1: args[n]="-scale";   n++; break;
+		case 2: args[n]="-aspect";  n++; break;
+		case 3: args[n]="-stretch"; n++; break;
+		case 4: args[n]="-bestfit"; n++; break;
+		default: break;
 	}
-	if ((pnd_video_aspect==2) || (pnd_video_aspect==6))
-	{
-		args[n]="-aspect"; n++;
-	}
-	if ((pnd_video_aspect==3) || (pnd_video_aspect==7))
-	{
-		args[n]="-stretch"; n++;
-	}
-	if ((pnd_video_aspect>=4) && (pnd_video_aspect<=7))
+	
+	if (pnd_video_rotate)
 	{
 		args[n]="-ror"; n++;
 		args[n]="-rotatecontrols"; n++;
+	}
+	
+	switch(pnd_video_filter)
+	{
+		case 0:
+			args[n]="-filter"; n++;
+			args[n]="none"; n++;
+			break;
+		case 1:
+			args[n]="-filter"; n++;
+			args[n]="default"; n++;
+			break;
+		default:
+			/* Automatic */
+			break;
 	}
 	
 	/* pnd_video_sync */
@@ -714,10 +753,10 @@ void execute_game (char *playemu, char *playgame)
 
 	switch (pnd_volume)
 	{
-	    case 4: break; /* nothing, default to maximum volume */
 		case 3: args[n]="-volume"; n++; args[n]="-4"; n++; break;
 		case 2: args[n]="-volume"; n++; args[n]="-8"; n++; break;
 		case 1: args[n]="-volume"; n++; args[n]="-10"; n++; break;
+	    default: break; /* nothing, default to maximum volume */
 	}
 
 	args[n]=NULL;
@@ -737,6 +776,9 @@ int main (int argc, char **argv)
 {
 	FILE *f;
 
+	/* Nearest neighbour filter for front end */
+	pnd_fir_filter_set( PND_FIR_FILTER_NONE );
+	
 	/* Initialization */
 	pnd_init(1000,8,22050,16,0,60);
 
@@ -757,7 +799,8 @@ int main (int argc, char **argv)
 	f=fopen("frontend/mame.cfg","r");
 	if (f) {
 		fscanf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&pnd_freq,&pnd_video_depth,&pnd_video_aspect,&pnd_video_sync,
-		&pnd_frameskip,&pnd_sound,&pnd_clock_cpu,&pnd_clock_sound,&pnd_cpu_cores,&pnd_ramtweaks,&last_game_selected,&pnd_cheat,&pnd_volume);
+		&pnd_frameskip,&pnd_sound,&pnd_clock_cpu,&pnd_clock_sound,&pnd_cpu_cores,&pnd_ramtweaks,&last_game_selected,
+		&pnd_cheat,&pnd_volume,&pnd_video_rotate,&pnd_video_filter);
 		fclose(f);
 	}
 	
@@ -768,7 +811,8 @@ int main (int argc, char **argv)
 	f=fopen("frontend/mame.cfg","w");
 	if (f) {
 		fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",pnd_freq,pnd_video_depth,pnd_video_aspect,pnd_video_sync,
-		pnd_frameskip,pnd_sound,pnd_clock_cpu,pnd_clock_sound,pnd_cpu_cores,pnd_ramtweaks,last_game_selected,pnd_cheat,pnd_volume);
+		pnd_frameskip,pnd_sound,pnd_clock_cpu,pnd_clock_sound,pnd_cpu_cores,pnd_ramtweaks,last_game_selected,
+		pnd_cheat,pnd_volume,pnd_video_rotate,pnd_video_filter);
 		fclose(f);
 		sync();
 	}

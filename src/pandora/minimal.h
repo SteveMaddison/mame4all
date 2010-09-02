@@ -43,6 +43,11 @@
 #define PHYS_SCREEN_WIDTH  800
 #define PHYS_SCREEN_HEIGHT 480
 
+enum {
+	PND_FIR_FILTER_NONE = 0,
+	PND_FIR_FILTER_DEFAULT
+};
+
 enum  { PND_UP=0x1,       PND_LEFT=0x4,       PND_DOWN=0x10,  PND_RIGHT=0x40,
         PND_START=1<<8,   PND_SELECT=1<<9,    PND_L=1<<10,    PND_R=1<<11,
         PND_A=1<<12,      PND_B=1<<13,        PND_X=1<<14,    PND_Y=1<<15 };
@@ -84,6 +89,7 @@ extern void *pnd_realloc(void *ptr, unsigned int size);
 extern void *pnd_calloc(unsigned int nmemb, unsigned int size);
 
 extern void pnd_set_video_mode(int bpp,int width,int height);
+extern int pnd_fir_filter_set(int f);
 extern void pnd_set_clock(int mhz);
 
 #ifdef __cplusplus

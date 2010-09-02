@@ -93,6 +93,8 @@ int main (int argc, char **argv)
 	extern int video_border;
 	extern int video_aspect;
 	extern int video_stretch;
+	extern int video_fit;
+	extern int video_filter;
 	extern int throttle;
 	
 	memset(&options,0,sizeof(options));
@@ -120,16 +122,25 @@ int main (int argc, char **argv)
 			video_aspect=1;
 		if (strcasecmp(argv[i],"-stretch") == 0)
 			video_stretch=1;
+		if (strcasecmp(argv[i],"-bestfit") == 0)
+			video_fit=1;
 		if (strcasecmp(argv[i],"-nothrottle") == 0)
 			throttle=0;
 		if ((strcasecmp(argv[i],"-clock") == 0) && (i<argc-1))
 			pnd_clock=atoi(argv[i+1]);
-        	if (strcasecmp(argv[i],"-playback") == 0)
+		if ((strcasecmp(argv[i],"-filter") == 0) && (i<argc-1))
+		{
+			if( strcasecmp(argv[i+1],"none") == 0 )
+				video_filter = PND_FIR_FILTER_NONE;
+			else
+				video_filter = PND_FIR_FILTER_DEFAULT;
+		}
+        if (strcasecmp(argv[i],"-playback") == 0)
 		{
 			i++;
 			if (i < argc)  /* point to inp file name */
 				playbackname = argv[i];
-        	}
+    	}
 	}
 
 	/* Initialization */
