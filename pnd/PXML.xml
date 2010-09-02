@@ -3,6 +3,7 @@
   <application id="mame4all-2.5" appdata="mame4all">
     <title lang="en_US">MAME4ALL Beta</title>
     <description lang="en_US">Multiple Arcade Machine Emulator</description>
+    <info name="MAME4ALL Documentation" type="text/html" src="info.html"/>
     
     <exec command="mame.sh"/>
     <version major="2" minor="5" release="0" build="0"/>
@@ -19,4 +20,3 @@
     </categories>
   </application>
 </PXML>
-
