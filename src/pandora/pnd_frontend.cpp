@@ -247,13 +247,16 @@ static int show_options(char *game)
 	sprintf(text,"frontend/%s.cfg",game);
 	f=fopen(text,"r");
 	if (f) {
-		fscanf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&pnd_freq,&pnd_video_depth,&pnd_video_aspect,&pnd_video_sync,
-		&pnd_frameskip,&pnd_sound,&pnd_clock_cpu,&pnd_clock_sound,&pnd_cpu_cores,&pnd_ramtweaks,&i,&pnd_cheat,&pnd_volume);
+		fscanf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&pnd_freq,&pnd_video_depth,&pnd_video_aspect,&pnd_video_sync,
+		&pnd_frameskip,&pnd_sound,&pnd_clock_cpu,&pnd_clock_sound,&pnd_cpu_cores,&pnd_ramtweaks,&i,&pnd_cheat,&pnd_volume,
+		&pnd_video_rotate,&pnd_video_filter);
 		fclose(f);
 	}
 
 	while(1)
 	{
+		y_Pos = y_PosTop;
+		
 		/* Draw background image */
 		blit_bmp_8bpp(pnd_screen15,menu_bmp);
 
@@ -268,9 +271,9 @@ static int show_options(char *game)
 		{
 			case 0: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Normal"); break;
 			case 1: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Scale"); break;
-			case 3: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    4:3"); break;
-			case 4: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Stretch"); break;
-			case 5: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Best Fit"); break;
+			case 2: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    4:3"); break;
+			case 3: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Stretch"); break;
+			case 4: pnd_gamelist_text_out_fmt(x_Pos,y_Pos,"Video Aspect    Fit"); break;
 		}
 
 		/* Video Rotation */
@@ -387,6 +390,11 @@ static int show_options(char *game)
 		pnd_video_flip();
 		while(pnd_joystick_read(0)&0x8c0ff55) { pnd_timer_delay(150); }
 		while(!(ExKey=pnd_joystick_read(0)&0x8c0ff55)) { }
+		
+		/* Map left/right to L/R */
+		if(ExKey & PND_LEFT)  ExKey |= PND_L;
+		if(ExKey & PND_RIGHT) ExKey |= PND_R;
+
 		if(ExKey & PND_DOWN){
 			selected_option++;
 			selected_option = selected_option % options_count;
@@ -399,34 +407,62 @@ static int show_options(char *game)
 		else if(ExKey & PND_R || ExKey & PND_L)
 		{
 			switch(selected_option) {
-			case 0:
+/*			case 0:
 				switch (pnd_video_depth)
 				{
 					case -1: pnd_video_depth=8; break;
 					case 8: pnd_video_depth=16; break;
 					case 16: pnd_video_depth=-1; break;
 				}
-				break;
-			case 1:
+				break; */
+			case 0:
 				if(ExKey & PND_R)
 				{
 					pnd_video_aspect++;
-					if (pnd_video_aspect>7)
+					if (pnd_video_aspect>4)
 						pnd_video_aspect=0;
 				}
 				else
 				{
 					pnd_video_aspect--;
 					if (pnd_video_aspect<0)
-						pnd_video_aspect=7;
+						pnd_video_aspect=4;
 				}
 				break;
+			case 1:
+				if( pnd_video_rotate )
+					pnd_video_rotate = 0;
+				else
+					pnd_video_rotate = 1;
+				break;
 			case 2:
-				pnd_video_sync=pnd_video_sync+1;
-				if (pnd_video_sync>2)
-					pnd_video_sync=-1;
+				if(ExKey & PND_R) {
+					pnd_video_filter++;
+					if (pnd_video_filter>1)
+						pnd_video_filter=-1;
+				}
+				else
+				{
+					pnd_video_filter--;
+					if (pnd_video_filter<-1)
+						pnd_video_filter=1;				
+				}
 				break;
 			case 3:
+				if(ExKey & PND_R) {
+					pnd_video_sync++;
+					if (pnd_video_sync>2)
+						pnd_video_sync=-1;
+					break;
+				}
+				else
+				{
+					pnd_video_sync--;
+					if (pnd_video_sync<-1)
+						pnd_video_sync=2;
+					break;				
+				}
+			case 4:
 				/* "Frame-Skip" */
 				if(ExKey & PND_R)
 				{
@@ -441,7 +477,7 @@ static int show_options(char *game)
 						pnd_frameskip=11;
 				}
 				break;
-			case 4:
+			case 5:
 				if(ExKey & PND_R)
 				{
 					pnd_sound ++;
@@ -455,7 +491,7 @@ static int show_options(char *game)
 						pnd_sound=15;
 				}
 				break;
-			case 5:
+			case 6:
 				/* "CPU Clock" */
 				if(ExKey & PND_R)
 				{
@@ -470,7 +506,7 @@ static int show_options(char *game)
 						pnd_clock_cpu = 10;
 				}
 				break;
-			case 6:
+			case 7:
 				/* "Audio Clock" */
 				if(ExKey & PND_R)
 				{
@@ -484,14 +520,15 @@ static int show_options(char *game)
 						pnd_clock_sound = 10;
 				}
 				break;
-			case 7:
+			case 8:
 				pnd_cpu_cores=(pnd_cpu_cores+1)%6;
 				break;
-			case 8:
+			case 9:
 				pnd_cheat=!pnd_cheat;
 				break;
-            case 9:
+			/* case 10: */
                 /* Volume */
+                /*
                 if(ExKey & PND_R)
                 {
                     pnd_volume++;
@@ -504,6 +541,7 @@ static int show_options(char *game)
                         pnd_volume = 4;
                 }
                 break;
+                */
 			}
 		}
 
@@ -623,7 +661,7 @@ void execute_game (char *playemu, char *playgame)
 		case 1: args[n]="-scale";   n++; break;
 		case 2: args[n]="-aspect";  n++; break;
 		case 3: args[n]="-stretch"; n++; break;
-		case 4: args[n]="-bestfit"; n++; break;
+		case 4: args[n]="-fit"; n++; break;
 		default: break;
 	}
 	
@@ -798,7 +836,7 @@ int main (int argc, char **argv)
 	/* Read default configuration */
 	f=fopen("frontend/mame.cfg","r");
 	if (f) {
-		fscanf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&pnd_freq,&pnd_video_depth,&pnd_video_aspect,&pnd_video_sync,
+		fscanf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&pnd_freq,&pnd_video_depth,&pnd_video_aspect,&pnd_video_sync,
 		&pnd_frameskip,&pnd_sound,&pnd_clock_cpu,&pnd_clock_sound,&pnd_cpu_cores,&pnd_ramtweaks,&last_game_selected,
 		&pnd_cheat,&pnd_volume,&pnd_video_rotate,&pnd_video_filter);
 		fclose(f);
@@ -810,7 +848,7 @@ int main (int argc, char **argv)
 	/* Write default configuration */
 	f=fopen("frontend/mame.cfg","w");
 	if (f) {
-		fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",pnd_freq,pnd_video_depth,pnd_video_aspect,pnd_video_sync,
+		fprintf(f,"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",pnd_freq,pnd_video_depth,pnd_video_aspect,pnd_video_sync,
 		pnd_frameskip,pnd_sound,pnd_clock_cpu,pnd_clock_sound,pnd_cpu_cores,pnd_ramtweaks,last_game_selected,
 		pnd_cheat,pnd_volume,pnd_video_rotate,pnd_video_filter);
 		fclose(f);

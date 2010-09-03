@@ -122,7 +122,7 @@ int main (int argc, char **argv)
 			video_aspect=1;
 		if (strcasecmp(argv[i],"-stretch") == 0)
 			video_stretch=1;
-		if (strcasecmp(argv[i],"-bestfit") == 0)
+		if (strcasecmp(argv[i],"-fit") == 0)
 			video_fit=1;
 		if (strcasecmp(argv[i],"-nothrottle") == 0)
 			throttle=0;

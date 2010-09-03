@@ -238,28 +238,21 @@ INLINE void swap_dirty(void)
  */
 static void select_display_mode(int width,int height,int depth,int attributes,int orientation)
 {
-	/* 16 bit color is supported only by VESA modes */
-	if (depth == 16 || depth == 32)
+	if (!width && !height)
 	{
-		logerror("Game needs %d-bit colors.\n",depth);
-	}
-
-	if (vector_game)
-	{
-		/* vector games use hi-res 4:3 as default */
+		gfx_width = PHYS_SCREEN_WIDTH;
 		gfx_height = PHYS_SCREEN_HEIGHT;
-		gfx_width = (PHYS_SCREEN_HEIGHT/3)*4;
 	}
 	else {
-		/* allow requested mode */
+		/* allow requested mode (within reason) */
 		gfx_width=width;
 		gfx_height=height;
-	}
+		
+		if( gfx_width > PHYS_SCREEN_WIDTH )
+			gfx_width = PHYS_SCREEN_WIDTH;
 
-	if (!gfx_width && !gfx_height)
-	{
-		gfx_width = PHYS_SCREEN_WIDTH/2;
-		gfx_height = PHYS_SCREEN_HEIGHT/2;
+		if( gfx_height > PHYS_SCREEN_HEIGHT )
+			gfx_height = PHYS_SCREEN_HEIGHT;
 	}
 }
 
@@ -443,7 +436,16 @@ int osd_create_display(int width,int height,int depth,int fps,int attributes,int
 			scale ++;
 		
 		if( video_fit ) {
-			/* Best fit : select an integer scale which best matches the
+			/* Fit: largest integer scale which fits without clipping. */
+			scale--;
+			if( scale < 1 ) scale = 1;
+			
+			pnd_phys_width  = width  * scale;
+			pnd_phys_height = height * scale;
+
+		}
+		else {
+			/* Normal mode : select an integer scale which best matches the
 			   physical screen. Borders and/or clipping may occur. */
 			   
 			if( scale > 1 ) {
@@ -483,14 +485,6 @@ int osd_create_display(int width,int height,int depth,int fps,int attributes,int
 				/* Reset the screen mode with out new value(s). */
 				select_display_mode(width,height,depth,attributes,orientation);
 			}
-		}
-		else {
-			/* Normal mode: largest integer scale which fits without clipping. */
-			scale--;
-			if( scale < 1 ) scale = 1;
-			
-			pnd_phys_width  = width  * scale;
-			pnd_phys_height = height * scale;
 		}
 	}
 

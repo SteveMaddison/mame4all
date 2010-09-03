@@ -49,9 +49,6 @@ int pnd_usbjoy_check (struct usbjoy * joy) {
 			if (q == 7)  { joyExKey |= PND_R; } /* right shoulder button 2 */
 			if (q == 8)  { joyExKey |= PND_SELECT; }
 			if (q == 9)  { joyExKey |= PND_START; }
-
-			if (q == 10) { joyExKey |= PND_PUSH; }
-			if (q == 11) { joyExKey |= PND_PUSH; }
 		}
 	}
 	return joyExKey;

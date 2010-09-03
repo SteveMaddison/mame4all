@@ -1,6 +1,6 @@
 ifeq ($(TARGET),)
 TARGET = mame
-# TARGET = neomame
+#TARGET = neomame
 endif
 
 # set this the operating system you're building for
@@ -24,13 +24,14 @@ MD = @mkdir
 RM = @rm -f
 CP = @cp
 CAT = @cat
+CHMOD = @chmod
 MKSQUASHFS = @mksquashfs
 PREFIX = /usr/local/pandora/arm-2009q3/usr
 DEVLIBS = -L$(PREFIX)/lib
 
 EMULATOR = $(TARGET)$(EXE)
 
-DEFS = -DPADNORA -DLSB_FIRST -DALIGN_INTS -DALIGN_SHORTS -DINLINE="static __inline" -Dasm="__asm__ __volatile__" -DMAME_UNDERCLOCK -DMAME_FASTSOUND -DENABLE_AUTOFIRE -DBIGCASE
+DEFS = -DPANDORA -DLSB_FIRST -DALIGN_INTS -DALIGN_SHORTS -DINLINE="static __inline" -Dasm="__asm__ __volatile__" -DMAME_UNDERCLOCK -DMAME_FASTSOUND -DENABLE_AUTOFIRE -DBIGCASE
 # -DMAME_MEMINLINE
 
 CFLAGS = -g -march=armv7-a -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -fsigned-char $(DEVLIBS) \
@@ -102,7 +103,8 @@ mame4all.pnd: all blanker
 	$(RM) -r pndtmp pndtmp.squash
 	$(MD) -p pndtmp
 	$(CP) -r pnd/* *.txt pndtmp/
-	$(CP) $(EMULATOR) $(EMULATOR)-fe blanker pndtmp/
+	$(CP) $(EMULATOR) neomame $(EMULATOR)-fe blanker pndtmp/
+	$(CHMOD) +x pndtmp/$(EMULATOR) pndtmp/neomame pndtmp/$(EMULATOR)-fe pndtmp/blanker pndtmp/mame.sh
 	$(MKSQUASHFS) pndtmp pndtmp.squash
 	$(CAT) pndtmp.squash pndtmp/PXML.xml pndtmp/mame.png > $@
 

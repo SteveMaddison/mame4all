@@ -58,10 +58,13 @@ int run_game(int game)
 	else
 		Machine->color_depth = 8;
 
-	//if (options.vector_width == 0) options.vector_width = 640;
-	//if (options.vector_height == 0) options.vector_height = 480;
+#ifdef PANDORA
+	if (options.vector_width == 0) options.vector_width = 640;
+	if (options.vector_height == 0) options.vector_height = 480;
+#else
 	if (options.vector_width == 0) options.vector_width = 320;
 	if (options.vector_height == 0) options.vector_height = 240;
+#endif
 
 	Machine->sample_rate = options.samplerate;
 

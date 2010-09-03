@@ -56,7 +56,7 @@ extern int master_volume;
 #include <stdio.h>
 #include <string.h>
 
-#define PND_DEBUG 1
+//#define PND_DEBUG 1
 
 #define PND_FBDEV "/dev/fb1"
 
@@ -301,8 +301,13 @@ void pnd_sound_volume(int vol)
  	if( vol < 0 ) vol = 0;
  	if( vol > 100 ) vol = 100;
  	 		
- 	if( vol > 0 )
- 		master_volume = vol; 		
+ 	if( vol > 0 ) {
+ 		master_volume = vol;
+ 	}
+ 	else {
+ 		if( pnd_audio_spec.userdata )
+	 		memset( pnd_audio_spec.userdata, 0 , pnd_audio_buffer_len );
+ 	}
 }
 
 void pnd_timer_delay(unsigned long ticks)
@@ -344,6 +349,7 @@ void pnd_sound_play(void *buff, int len)
 {
 	if( pnd_sndlen+len > pnd_audio_buffer_len ) {
 		/* Overrun */
+		pnd_sndlen = 0;
 		return;
 	}
 	
@@ -436,7 +442,7 @@ void pnd_init(int ticks_per_second, int bpp, int rate, int bits, int stereo, int
     else
     	pnd_audio_spec.format = AUDIO_S8;
     pnd_audio_spec.channels = stereo ? 2: 1;
-    pnd_audio_spec.samples = 1024;
+    pnd_audio_spec.samples = 512;
     pnd_audio_spec.callback = pnd_sound_callback;
     pnd_audio_spec.userdata = NULL;
 
@@ -462,6 +468,8 @@ void pnd_deinit(void)
 	memset( fb_ptr[0], 0, fb_mmap_size );
 	munmap( fb_ptr[0], fb_mmap_size );
 	close(fb_dev);
+
+	pnd_fir_filter_set( PND_FIR_FILTER_DEFAULT );
 
 	SDL_CloseAudio();
 
