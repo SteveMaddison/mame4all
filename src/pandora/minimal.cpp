@@ -49,6 +49,7 @@ int						pnd_clock=200;
 int 					rotate_controls=0;
 int						pnd_phys_width = PHYS_SCREEN_WIDTH;
 int						pnd_phys_height = PHYS_SCREEN_HEIGHT;
+unsigned char			pnd_keys[PND_KEY_MAX];
 
 extern int master_volume;
 #define MAX_SAMPLE_RATE (44100*2)
@@ -233,45 +234,65 @@ unsigned long pnd_joystick_read(int n)
 						if( ev[i].value == 0 ) {
 							// Key up
 							switch( ev[i].code ) {
-								case KEY_UP:			res &= ~PND_UP; break;
-								case KEY_DOWN:			res &= ~PND_DOWN; break;
-								case KEY_LEFT:			res &= ~PND_LEFT; break;
-								case KEY_RIGHT:			res &= ~PND_RIGHT; break;
+								case KEY_UP:			res &= ~(rotate_controls ? PND_LEFT : PND_UP); break;
+								case KEY_DOWN:			res &= ~(rotate_controls ? PND_RIGHT : PND_DOWN); break;
+								case KEY_LEFT:			res &= ~(rotate_controls ? PND_DOWN : PND_LEFT); break;
+								case KEY_RIGHT:			res &= ~(rotate_controls ? PND_UP : PND_RIGHT); break;
 								case KEY_LEFTALT:		res &= ~PND_START; break;
 								case KEY_LEFTCTRL:		res &= ~PND_SELECT; break;
 								case KEY_RIGHTSHIFT:	res &= ~PND_L; break;
 								case KEY_RIGHTCTRL: 	res &= ~PND_R; break;
-								case KEY_HOME:
-								case KEY_Q:				res &= ~PND_A; break;
-								case KEY_END:
-								case KEY_DOT:			res &= ~PND_B; break;
-								case KEY_PAGEDOWN:
-								case KEY_LEFTSHIFT:		res &= ~PND_X; break;
-								case KEY_PAGEUP:
-								case KEY_A:				res &= ~PND_Y; break;
+								case KEY_HOME:			res &= ~PND_A; break;
+								case KEY_END:			res &= ~PND_B; break;
+								case KEY_PAGEDOWN:		res &= ~PND_X; break;
+								case KEY_PAGEUP:		res &= ~PND_Y; break;
 								default: break;
+							}
+							if( ev[i].code < PND_KEY_MAX ) {
+								if( rotate_controls ) {
+									switch( ev[i].code ) {
+										case KEY_UP:	pnd_keys[KEY_LEFT] = 0; break;
+										case KEY_DOWN:	pnd_keys[KEY_RIGHT] = 0; break;
+										case KEY_LEFT:	pnd_keys[KEY_DOWN] = 0; break;
+										case KEY_RIGHT:	pnd_keys[KEY_UP] = 0; break;
+										default: pnd_keys[ev[i].code] = 0; break;
+									}
+								}
+								else {
+									pnd_keys[ev[i].code] = 0;
+								}
 							}
 						}
 						else if( ev[i].value == 1 ) {
 							// Key down
 							switch( ev[i].code ) {
-								case KEY_UP:			res |= PND_UP; break;
-								case KEY_DOWN:			res |= PND_DOWN; break;
-								case KEY_LEFT:			res |= PND_LEFT; break;
-								case KEY_RIGHT:			res |= PND_RIGHT; break;
+								case KEY_UP:			res |= (rotate_controls ? PND_LEFT : PND_UP); break;
+								case KEY_DOWN:			res |= (rotate_controls ? PND_RIGHT : PND_DOWN); break;
+								case KEY_LEFT:			res |= (rotate_controls ? PND_DOWN : PND_LEFT); break;
+								case KEY_RIGHT:			res |= (rotate_controls ? PND_UP : PND_RIGHT); break;
 								case KEY_LEFTALT:		res |= PND_START; break;
 								case KEY_LEFTCTRL:		res |= PND_SELECT; break;
 								case KEY_RIGHTSHIFT:	res |= PND_L; break;
 								case KEY_RIGHTCTRL: 	res |= PND_R; break;
-								case KEY_HOME:
-								case KEY_Q:				res |= PND_A; break;
-								case KEY_END:
-								case KEY_DOT:			res |= PND_B; break;
-								case KEY_PAGEDOWN:
-								case KEY_LEFTSHIFT:		res |= PND_X; break;
-								case KEY_PAGEUP:
-								case KEY_A:				res |= PND_Y; break;
+								case KEY_HOME:			res |= PND_A; break;
+								case KEY_END:			res |= PND_B; break;
+								case KEY_PAGEDOWN:		res |= PND_X; break;
+								case KEY_PAGEUP:		res |= PND_Y; break;
 								default: break;
+							}
+							if( ev[i].code < PND_KEY_MAX ) {
+								if( rotate_controls ) {
+									switch( ev[i].code ) {
+										case KEY_UP:	pnd_keys[KEY_LEFT] = 1; break;
+										case KEY_DOWN:	pnd_keys[KEY_RIGHT] = 1; break;
+										case KEY_LEFT:	pnd_keys[KEY_DOWN] = 1; break;
+										case KEY_RIGHT:	pnd_keys[KEY_UP] = 1; break;
+										default: pnd_keys[ev[i].code] = 1; break;
+									}
+								}
+								else {
+									pnd_keys[ev[i].code] = 1;
+								}
 							}
 						}
 					}
@@ -284,7 +305,7 @@ unsigned long pnd_joystick_read(int n)
 	{
 		res |= pnd_usbjoy_check(joys[n]);
 	}
-  	
+
 	return res;
 }
 
@@ -362,7 +383,9 @@ void pnd_sound_play(void *buff, int len)
 static void pnd_sound_callback(void *data, Uint8 *stream, int len)
 {
 	if( pnd_sndlen < len ) {
+#ifdef PND_DEBUG
 		printf("Audio underrun (%d/%d bytes)\n", pnd_sndlen, len);
+#endif
 		memcpy(stream, data, pnd_sndlen );
 		pnd_sndlen = 0;
 		return;
@@ -430,6 +453,11 @@ void pnd_init(int ticks_per_second, int bpp, int rate, int bits, int stereo, int
 		else {
 			close( fd );
 		}
+	}
+
+	/* All keys unpressed. */
+	for( i = 0 ; i < PND_KEY_MAX ; i++ ) {
+		pnd_keys[i] = 0;
 	}
 
 	/* USB Joysticks Initialization */

@@ -52,6 +52,8 @@ enum  { PND_UP=0x1,       PND_LEFT=0x4,       PND_DOWN=0x10,  PND_RIGHT=0x40,
         PND_START=1<<8,   PND_SELECT=1<<9,    PND_L=1<<10,    PND_R=1<<11,
         PND_A=1<<12,      PND_B=1<<13,        PND_X=1<<14,    PND_Y=1<<15 };
 
+#define PND_KEY_MAX 256
+
 extern volatile unsigned short 	pnd_palette[512];
 extern unsigned short		pnd_palette_rgb[256];
 extern unsigned char 		*pnd_screen8;
@@ -62,6 +64,7 @@ extern int 			pnd_pal_50hz;
 extern int			pnd_clock;
 extern int			pnd_phys_width;
 extern int			pnd_phys_height;
+extern unsigned char	pnd_keys[PND_KEY_MAX];
 
 extern void pnd_init(int tickspersecond, int bpp, int rate, int bits, int stereo, int hz);
 extern void pnd_deinit(void);

@@ -132,7 +132,11 @@ char ipdn_defaultstrings[][MAX_DEFSTR_LEN] =
 
 struct ipd inputport_defaults[] =
 {
+#ifdef PANDORA
 	{ IPT_UI_CONFIGURE,         "Config Menu",       SEQ_DEF_1(KEYCODE_TAB) },
+#else
+	{ IPT_UI_CONFIGURE,         "Config Menu",       SEQ_DEF_3(KEYCODE_TAB, CODE_OR, KEYCODE_MENU) },
+#endif
 	{ IPT_UI_ON_SCREEN_DISPLAY, "On Screen Display", SEQ_DEF_1(KEYCODE_TILDE) },
 	{ IPT_UI_PAUSE,             "Pause",             SEQ_DEF_1(KEYCODE_P) },
 	{ IPT_UI_RESET_MACHINE,     "Reset Game",        SEQ_DEF_1(KEYCODE_F3) },
@@ -153,15 +157,27 @@ struct ipd inputport_defaults[] =
 	{ IPT_UI_RIGHT,             "UI Right",          SEQ_DEF_3(KEYCODE_RIGHT, CODE_OR, JOYCODE_1_RIGHT) },
 	{ IPT_UI_SELECT,            "UI Select",         SEQ_DEF_3(KEYCODE_ENTER, CODE_OR, JOYCODE_1_BUTTON1) },
 	{ IPT_UI_CANCEL,            "UI Cancel",         SEQ_DEF_1(KEYCODE_ESC) },
+#ifdef PANDORA
+	{ IPT_UI_PAN_UP,            "Pan Up",            SEQ_DEF_2(KEYCODE_PGUP, KEYCODE_LSHIFT) },
+	{ IPT_UI_PAN_DOWN,          "Pan Down",          SEQ_DEF_2(KEYCODE_PGDN, KEYCODE_LSHIFT) },
+	{ IPT_UI_PAN_LEFT,          "Pan Left",          SEQ_DEF_2(KEYCODE_HOME, KEYCODE_LSHIFT) },
+	{ IPT_UI_PAN_RIGHT,         "Pan Right",         SEQ_DEF_2(KEYCODE_END, KEYCODE_LSHIFT) },
+	{ IPT_START1, "1 Player Start",  SEQ_DEF_3(KEYCODE_1, CODE_OR, KEYCODE_LALT) },
+#else
 	{ IPT_UI_PAN_UP,            "Pan Up",            SEQ_DEF_3(KEYCODE_PGUP, CODE_NOT, KEYCODE_LSHIFT) },
 	{ IPT_UI_PAN_DOWN,          "Pan Down",          SEQ_DEF_3(KEYCODE_PGDN, CODE_NOT, KEYCODE_LSHIFT) },
 	{ IPT_UI_PAN_LEFT,          "Pan Left",          SEQ_DEF_2(KEYCODE_PGUP, KEYCODE_LSHIFT) },
 	{ IPT_UI_PAN_RIGHT,         "Pan Right",         SEQ_DEF_2(KEYCODE_PGDN, KEYCODE_LSHIFT) },
 	{ IPT_START1, "1 Player Start",  SEQ_DEF_1(KEYCODE_1) },
+#endif
 	{ IPT_START2, "2 Players Start", SEQ_DEF_1(KEYCODE_2) },
 	{ IPT_START3, "3 Players Start", SEQ_DEF_1(KEYCODE_3) },
 	{ IPT_START4, "4 Players Start", SEQ_DEF_1(KEYCODE_4) },
+#ifdef PANDORA
+	{ IPT_COIN1,  "Coin 1",          SEQ_DEF_3(KEYCODE_5, CODE_OR, KEYCODE_LCONTROL) },
+#else
 	{ IPT_COIN1,  "Coin 1",          SEQ_DEF_1(KEYCODE_5) },
+#endif
 	{ IPT_COIN2,  "Coin 2",          SEQ_DEF_1(KEYCODE_6) },
 	{ IPT_COIN3,  "Coin 3",          SEQ_DEF_1(KEYCODE_7) },
 	{ IPT_COIN4,  "Coin 4",          SEQ_DEF_1(KEYCODE_8) },
@@ -179,12 +195,21 @@ struct ipd inputport_defaults[] =
 	{ IPT_JOYSTICK_DOWN       | IPF_PLAYER1, "P1 Down",        SEQ_DEF_3(KEYCODE_DOWN, CODE_OR, JOYCODE_1_DOWN)  },
 	{ IPT_JOYSTICK_LEFT       | IPF_PLAYER1, "P1 Left",        SEQ_DEF_3(KEYCODE_LEFT, CODE_OR, JOYCODE_1_LEFT)  },
 	{ IPT_JOYSTICK_RIGHT      | IPF_PLAYER1, "P1 Right",       SEQ_DEF_3(KEYCODE_RIGHT, CODE_OR, JOYCODE_1_RIGHT) },
+#ifdef PANDORA
+	{ IPT_BUTTON1             | IPF_PLAYER1, "P1 Button 1",    SEQ_DEF_5(KEYCODE_END, CODE_OR, KEYCODE_STOP, CODE_OR, JOYCODE_1_BUTTON1) },
+	{ IPT_BUTTON2             | IPF_PLAYER1, "P1 Button 2",    SEQ_DEF_5(KEYCODE_PGDN, CODE_OR, KEYCODE_LSHIFT, CODE_OR, JOYCODE_1_BUTTON2) },
+	{ IPT_BUTTON3             | IPF_PLAYER1, "P1 Button 3",    SEQ_DEF_5(KEYCODE_HOME, CODE_OR, KEYCODE_Q, CODE_OR, JOYCODE_1_BUTTON3) },
+	{ IPT_BUTTON4             | IPF_PLAYER1, "P1 Button 4",    SEQ_DEF_5(KEYCODE_PGUP, CODE_OR, KEYCODE_A, CODE_OR, JOYCODE_1_BUTTON4) },
+	{ IPT_BUTTON5             | IPF_PLAYER1, "P1 Button 5",    SEQ_DEF_3(KEYCODE_RSHIFT, CODE_OR, JOYCODE_1_BUTTON5) },
+	{ IPT_BUTTON6             | IPF_PLAYER1, "P1 Button 6",    SEQ_DEF_3(KEYCODE_RCONTROL, CODE_OR, JOYCODE_1_BUTTON6) },
+#else
 	{ IPT_BUTTON1             | IPF_PLAYER1, "P1 Button 1",    SEQ_DEF_3(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1) },
 	{ IPT_BUTTON2             | IPF_PLAYER1, "P1 Button 2",    SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2) },
 	{ IPT_BUTTON3             | IPF_PLAYER1, "P1 Button 3",    SEQ_DEF_3(KEYCODE_SPACE, CODE_OR, JOYCODE_1_BUTTON3) },
 	{ IPT_BUTTON4             | IPF_PLAYER1, "P1 Button 4",    SEQ_DEF_3(KEYCODE_LSHIFT, CODE_OR, JOYCODE_1_BUTTON4) },
 	{ IPT_BUTTON5             | IPF_PLAYER1, "P1 Button 5",    SEQ_DEF_3(KEYCODE_Z, CODE_OR, JOYCODE_1_BUTTON5) },
 	{ IPT_BUTTON6             | IPF_PLAYER1, "P1 Button 6",    SEQ_DEF_3(KEYCODE_X, CODE_OR, JOYCODE_1_BUTTON6) },
+#endif
 	{ IPT_BUTTON7             | IPF_PLAYER1, "P1 Button 7",    SEQ_DEF_1(KEYCODE_C) },
 	{ IPT_BUTTON8             | IPF_PLAYER1, "P1 Button 8",    SEQ_DEF_1(KEYCODE_V) },
 	{ IPT_BUTTON9             | IPF_PLAYER1, "P1 Button 9",    SEQ_DEF_1(KEYCODE_B) },
