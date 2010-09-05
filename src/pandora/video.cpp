@@ -448,29 +448,16 @@ int osd_create_display(int width,int height,int depth,int fps,int attributes,int
 			/* Normal mode : select an integer scale which best matches the
 			   physical screen. Borders and/or clipping may occur. */
 			   
-			if( scale > 1 ) {
-				/* Calculate screen diagonal for this scale and the previous one */
-				int screen_diag = sqrt( (PHYS_SCREEN_WIDTH*PHYS_SCREEN_WIDTH) + (PHYS_SCREEN_HEIGHT*PHYS_SCREEN_HEIGHT) );
-				int this_diag = sqrt( pow( width*scale, 2 ) + pow( height*scale, 2 ) );
-				int prev_diag = sqrt( pow( width*(scale-1), 2 ) + pow( height*(scale-1), 2 ) );
-	
-				/* If previous scale is closer to the physical screen diagonal, use it. */
-				if( abs(screen_diag-prev_diag) < abs(screen_diag-this_diag) ) {
-					scale--;
-				}
+			/* Limit clipping to 10% on either axis. */
+			while( ( width * scale > PHYS_SCREEN_WIDTH + PHYS_SCREEN_WIDTH/10 )
+			||     ( height * scale > PHYS_SCREEN_HEIGHT + PHYS_SCREEN_HEIGHT/10 ) ) {
+				scale--;
 			}
-				
+
+			if( scale < 1 ) scale = 1;
+
 			pnd_phys_width  = width  * scale;
 			pnd_phys_height = height * scale;
-			
-			/* Clipping in both dimensions? Take a step back, if we can. */
-			if( pnd_phys_width > PHYS_SCREEN_WIDTH && pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
-				if( scale > 1 ) {
-					scale--;
-					pnd_phys_width  = width  * scale;
-					pnd_phys_height = height * scale;
-				}
-			}
 			
 			if( pnd_phys_width > PHYS_SCREEN_WIDTH || pnd_phys_height > PHYS_SCREEN_HEIGHT ) {
 				/* Clipping... */

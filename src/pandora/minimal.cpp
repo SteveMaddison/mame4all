@@ -362,6 +362,7 @@ void pnd_sound_play(void *buff, int len)
 static void pnd_sound_callback(void *data, Uint8 *stream, int len)
 {
 	if( pnd_sndlen < len ) {
+		printf("Audio underrun (%d/%d bytes)\n", pnd_sndlen, len);
 		memcpy(stream, data, pnd_sndlen );
 		pnd_sndlen = 0;
 		return;
