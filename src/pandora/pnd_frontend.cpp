@@ -18,6 +18,8 @@ int game_num_avail=0;
 static int last_game_selected=0;
 char playemu[16] = "mame\0";
 char playgame[16] = "builtinn\0";
+char *rompath = NULL;
+char *samplepath = NULL;
 
 int pnd_freq=200;
 int pnd_video_depth=16;
@@ -83,7 +85,7 @@ static void game_list_init_nocache(void)
 {
 	int i;
 	FILE *f;
-	DIR *d=opendir("roms");
+	DIR *d=opendir(rompath?rompath:"roms");
 	char game[32];
 	if (d)
 	{
@@ -797,6 +799,16 @@ void execute_game (char *playemu, char *playgame)
 	    default: break; /* nothing, default to maximum volume */
 	}
 
+	if( rompath ) {
+		args[n]="-rompath"; n++;
+		args[n]=rompath; n++;
+	}
+
+	if( samplepath ) {
+		args[n]="-samplepath"; n++;
+		args[n]=samplepath; n++;
+	}
+
 	args[n]=NULL;
 	
 	for (i=0; i<n; i++)
@@ -813,6 +825,15 @@ void execute_game (char *playemu, char *playgame)
 int main (int argc, char **argv)
 {
 	FILE *f;
+
+	rompath = getenv("ROMPATH");
+	if( rompath && !*rompath ) rompath = NULL;
+	
+	samplepath = getenv("SAMPLEPATH");
+	if( samplepath && !*samplepath ) samplepath = NULL;
+
+	printf("ROMS: %s\n", rompath?rompath:"<default>");
+	printf("Samples: %s\n", samplepath?samplepath:"<default>");
 
 	/* Nearest neighbour filter for front end */
 	pnd_fir_filter_set( PND_FIR_FILTER_NONE );
@@ -860,3 +881,4 @@ int main (int argc, char **argv)
 	
 	exit (0);
 }
+

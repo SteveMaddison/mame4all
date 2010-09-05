@@ -357,6 +357,7 @@ int main (int argc, char **argv)
 		}
     */
 
+#ifndef PANDORA
     // Remove the mouse usage for certain games
     if ( (strcasecmp(drivers[game_index]->name,"hbarrel")==0) || (strcasecmp(drivers[game_index]->name,"hbarrelw")==0) ||
          (strcasecmp(drivers[game_index]->name,"midres")==0) || (strcasecmp(drivers[game_index]->name,"midresu")==0) ||
@@ -382,6 +383,13 @@ int main (int argc, char **argv)
         extern int use_mouse;
         use_mouse=0;
     }
+#else    
+    // This one gets rendered upside down...
+	if(strcasecmp(drivers[game_index]->name,"ddonpach")==0) {
+		options.flipx = 0;
+		options.flipy = 0;
+	}
+#endif
 
     /* go for it */
     printf ("%s (%s)...\n",drivers[game_index]->description,drivers[game_index]->name);
