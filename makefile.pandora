@@ -100,6 +100,7 @@ mame4all.pnd: all
 	$(MD) -p pndtmp
 	$(CP) -r pnd/* *.txt pndtmp/
 	$(CP) $(EMULATOR) neomame $(EMULATOR)-fe pndtmp/
+	touch pndtmp/dirs.rc
 	$(CHMOD) +x pndtmp/$(EMULATOR) pndtmp/neomame pndtmp/$(EMULATOR)-fe pndtmp/mame.sh
 	$(MKSQUASHFS) pndtmp pndtmp.squash
 	$(CAT) pndtmp.squash pndtmp/PXML.xml pndtmp/mame.png > $@
