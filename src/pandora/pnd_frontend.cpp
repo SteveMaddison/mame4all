@@ -604,8 +604,8 @@ static void select_game(char *emu, char *game)
 
 		if (ExKey & PND_UP) last_game_selected--;
 		if (ExKey & PND_DOWN) last_game_selected++;
-		if (ExKey & PND_L) last_game_selected-=21;
-		if (ExKey & PND_R) last_game_selected+=21;
+		if (ExKey & PND_L || ExKey & PND_LEFT) last_game_selected-=21;
+		if (ExKey & PND_R || ExKey & PND_RIGHT) last_game_selected+=21;
 		if ((ExKey & PND_L) && (ExKey & PND_R)) pnd_exit();
 
 		if ((ExKey & PND_A) || (ExKey & PND_B) || (ExKey & PND_START))
