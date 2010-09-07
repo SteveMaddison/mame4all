@@ -42,6 +42,7 @@ unsigned short			pnd_palette_rgb[256];
 SDL_AudioSpec 			pnd_audio_spec;
 int						pnd_audio_buffer_len=0;
 int						pnd_sndlen=0;
+int						pnd_vol = 100;
 int						pnd_sound_rate=22050;
 int						pnd_sound_stereo=1;
 int 					pnd_pal_50hz=0;
@@ -321,14 +322,21 @@ void pnd_sound_volume(int vol)
 {
  	if( vol < 0 ) vol = 0;
  	if( vol > 100 ) vol = 100;
- 	 		
+
  	if( vol > 0 ) {
  		master_volume = vol;
+ 		if( pnd_vol == 0 ) {
+ 			SDL_PauseAudio(0);
+ 			if( pnd_audio_spec.userdata )
+	 			memset( pnd_audio_spec.userdata, 0 , pnd_audio_buffer_len );
+ 			pnd_sndlen = 0;
+ 		}
  	}
  	else {
- 		if( pnd_audio_spec.userdata )
-	 		memset( pnd_audio_spec.userdata, 0 , pnd_audio_buffer_len );
+		SDL_PauseAudio(1);
  	}
+ 	
+ 	pnd_vol = vol;
 }
 
 void pnd_timer_delay(unsigned long ticks)
@@ -341,7 +349,7 @@ unsigned long pnd_timer_read(void)
 {
 	struct timeval tval;
 	gettimeofday(&tval, 0);
-	return (tval.tv_sec*1000000)+tval.tv_usec/pnd_ticks_per_second;
+	return ((tval.tv_sec*1000000)+tval.tv_usec)/pnd_ticks_per_second;
 }
 
 unsigned long pnd_timer_read_real(void)

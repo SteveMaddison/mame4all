@@ -9,7 +9,7 @@
 
 #define SCREEN_WIDTH 400
 #define SCREEN_HEIGHT 240
-#define BMP_SIZE ((SCREEN_WIDTH*SCREEN_HEIGHT)+(256*4))
+#define BMP_SIZE ((SCREEN_WIDTH*SCREEN_HEIGHT)+(256*4)+54)
 
 static unsigned char splash_bmp[BMP_SIZE];
 static unsigned char menu_bmp[BMP_SIZE];
@@ -27,8 +27,8 @@ int pnd_video_aspect=1;
 int pnd_video_rotate=0;
 int pnd_video_filter=-1;
 int pnd_video_sync=1;
-int pnd_frameskip=2;
-int pnd_sound = 1;
+int pnd_frameskip=-1;
+int pnd_sound = 14;
 int pnd_volume = 4;
 int pnd_clock_cpu=100;
 int pnd_clock_sound=100;
