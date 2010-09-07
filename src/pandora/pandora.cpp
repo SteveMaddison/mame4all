@@ -386,8 +386,8 @@ int main (int argc, char **argv)
 #else    
     // This one gets rendered upside down...
 	if(strcasecmp(drivers[game_index]->name,"ddonpach")==0) {
-		options.flipx = 0;
-		options.flipy = 0;
+		options.flipx = 1;
+		options.flipy = 1;
 	}
 #endif
 
