@@ -479,7 +479,7 @@ void pnd_init(int ticks_per_second, int bpp, int rate, int bits, int stereo, int
     else
     	pnd_audio_spec.format = AUDIO_S8;
     pnd_audio_spec.channels = stereo ? 2: 1;
-    pnd_audio_spec.samples = 512;
+    pnd_audio_spec.samples = 1024;
     pnd_audio_spec.callback = pnd_sound_callback;
     pnd_audio_spec.userdata = NULL;
 
