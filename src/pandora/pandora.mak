@@ -16,5 +16,4 @@ OSOBJS = $(OBJ)/pandora/minimal.o \
 	$(OBJ)/pandora/usbjoy_mame.o $(OBJ)/pandora/usbjoy.o
 
 FEOBJS = $(OBJ)/pandora/pnd_frontend.o $(OBJ)/pandora/minimal.o \
-	$(OBJ)/pandora/usbjoy.o $(OBJ)/pandora/usbjoy_mame.o 
-
+	$(OBJ)/pandora/usbjoy.o $(OBJ)/pandora/usbjoy_mame.o

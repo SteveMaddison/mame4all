@@ -8,6 +8,11 @@
 
 ***************************************************************************/
 
+#ifdef ENABLE_CPS2
+
+#include "driver.h"
+#include "cps1.h"       /* External CPS1 definitions */
+
 #if 1
 /* Graphics viewer functions */
 extern int  cps2_vh_start(void);
@@ -19,6 +24,14 @@ extern void cps2_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 #define cps2_vh_stop			cps2_vh_stop
 #define cps2_vh_screenrefresh	cps2_vh_screenrefresh
 #endif
+
+/* These are borrowed form cps1.cpp */
+extern struct MemoryReadAddress cps1_readmem[];
+extern struct MemoryWriteAddress cps1_writemem[];
+extern struct MemoryReadAddress qsound_readmem[];
+extern struct MemoryWriteAddress qsound_writemem[];
+extern struct GfxDecodeInfo cps1_gfxdecodeinfo[];
+extern struct QSound_interface qsound_interface;
 
 /* Export this function so that the vidhrdw routine can drive the
 Q-Sound hardware
@@ -1543,3 +1556,5 @@ GAME( 1997, vsav2,    0,       cps2, cps2, cps2, ROT0, "Capcom", "Vampire Savior
 GAME( 1995, xmcota,   0,       cps2, cps2, cps2, ROT0, "Capcom", "X-Men: Children of the Atom (USA 950105)" )
 GAME( 1994, xmcotaj,  xmcota,  cps2, cps2, cps2, ROT0, "Capcom", "X-Men: Children of the Atom (Japan 941219)" )
 GAME( 1996, xmvsf,    0,       cps2, cps2, cps2, ROT0, "Capcom", "X-Men Vs. Street Fighter (USA 961004)" )
+
+#endif /* ENABLE_CPS2 */

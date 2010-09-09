@@ -26,13 +26,14 @@ CP = @cp
 CAT = @cat
 CHMOD = @chmod
 MKSQUASHFS = @mksquashfs
-PREFIX = /usr/local/pandora/arm-2009q3/usr
+PREFIX = /usr
 DEVLIBS = -L$(PREFIX)/lib
 
 EMULATOR = $(TARGET)$(EXE)
 
 DEFS = -DPANDORA -DLSB_FIRST -DALIGN_INTS -DALIGN_SHORTS -DINLINE="static __inline" -Dasm="__asm__ __volatile__" -DMAME_UNDERCLOCK -DMAME_FASTSOUND -DENABLE_AUTOFIRE -DBIGCASE
 # -DMAME_MEMINLINE
+#DEFS += -DENABLE_CPS2
 
 CFLAGS = -g -march=armv7-a -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -fsigned-char $(DEVLIBS) \
 	-Isrc -Isrc/$(MAMEOS) -Isrc/zlib -I$(PREFIX)/include -I$(PREFIX)/include/SDL \

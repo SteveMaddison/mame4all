@@ -12,9 +12,14 @@ WRITE_HANDLER( cps1_eeprom_port_w );
 READ_HANDLER( cps1_output_r );
 WRITE_HANDLER( cps1_output_w );
 
+READ_HANDLER( qsound_sharedram_r );
+WRITE_HANDLER( qsound_sharedram_w );
+
 int  cps1_vh_start(void);
 void cps1_vh_stop(void);
 void cps1_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 void cps1_eof_callback(void);
+
+int cps1_qsound_interrupt(void);
 
 #endif

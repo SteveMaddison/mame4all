@@ -4,6 +4,7 @@
 
 */
 
+#ifdef ENABLE_CPS2
 
 
 #include "osdepend.h"
@@ -321,7 +322,4 @@ void cps2_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
     }
 }
 
-
-
-
-
+#endif /* ENABLE_CPS2 */

@@ -272,11 +272,12 @@ $(OBJ)/drivers/sf1.o: src/vidhrdw/sf1.cpp src/drivers/sf1.cpp
 $(OBJ)/drivers/mitchell.o: src/vidhrdw/mitchell.cpp src/drivers/mitchell.cpp
 $(OBJ)/drivers/cbasebal.o: src/vidhrdw/cbasebal.cpp src/drivers/cbasebal.cpp
 $(OBJ)/drivers/cps1.o: src/vidhrdw/cps1.cpp src/drivers/cps1.cpp
+$(OBJ)/drivers/cps2.o: src/vidhrdw/cps2.cpp src/drivers/cps2.cpp
 OBJ_CAPCOM = $(OBJ)/drivers/vulgus.o $(OBJ)/drivers/sonson.o $(OBJ)/drivers/higemaru.o $(OBJ)/drivers/1942.o $(OBJ)/drivers/exedexes.o \
 	$(OBJ)/drivers/commando.o $(OBJ)/drivers/gng.o $(OBJ)/drivers/gunsmoke.o $(OBJ)/drivers/srumbler.o $(OBJ)/drivers/lwings.o \
 	$(OBJ)/drivers/sidearms.o $(OBJ)/drivers/bionicc.o $(OBJ)/drivers/1943.o $(OBJ)/drivers/blktiger.o $(OBJ)/drivers/tigeroad.o \
 	$(OBJ)/drivers/lastduel.o $(OBJ)/drivers/sf1.o $(OBJ)/machine/kabuki.o $(OBJ)/drivers/mitchell.o $(OBJ)/drivers/cbasebal.o \
-	$(OBJ)/drivers/cps1.o $(OBJ)/drivers/zn.o
+	$(OBJ)/drivers/cps1.o $(OBJ)/drivers/cps2.o $(OBJ)/drivers/zn.o
 
 $(OBJ)/drivers/capbowl.o: src/machine/capbowl.cpp src/vidhrdw/capbowl.cpp src/vidhrdw/tms34061.cpp src/drivers/capbowl.cpp
 OBJ_CAPBOWL = $(OBJ)/drivers/capbowl.o
